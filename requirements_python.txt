@@ -1,0 +1,18 @@
+# Python 3.11.15
+numpy==1.26.4
+pandas==3.0.5
+xarray==2026.7.0
+scipy==1.17.1
+matplotlib==3.11.1
+seaborn==0.13.2
+scikit-learn==1.9.0
+physio==0.3.3
+pycns==0.0.1
+joblib==1.5.3
+tqdm==4.70.0
+openpyxl==3.1.5
+netCDF4==1.7.4
+h5netcdf==1.8.1
+ipykernel==7.3.0
+ipympl==0.10.0
+nbformat==5.11.0

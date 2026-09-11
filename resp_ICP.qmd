@@ -1,0 +1,90 @@
+---
+title: "ICP peak in inspiration or in expiration"
+subtitle: "Mixed-effects logistic regression on 60-min windows"
+author: "Baptiste Balanca"
+date: today
+lang: en
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    embed-resources: true
+    code-fold: show
+    code-tools: true
+    theme: cosmo
+    fig-width: 8
+    fig-height: 5
+execute:
+  warning: false
+  message: false
+---
+
+## Question and strategy
+
+What determines whether ICP peaks in **inspiration** rather than in **expiration**?
+
+The 60-min windows of a given patient are not independent: a naive test on
+11,000 windows from about a hundred patients makes everything significant. We therefore
+use a mixed-effects logistic regression (`lme4::glmer`, binomial family) with a random
+intercept per patient.
+
+::: {.callout-note}
+## Specification choice
+
+**The cluster is not in the model.** The clusters are built from `icp`,
+`icp_pulse_amplitude`, `P2P1` and `resp_in_icp`: putting them next to these same variables
+amounts to including a deterministic function of its own predictors. The cluster is kept
+as a descriptive variable, outside the model.
+:::
+
+## Preparation
+
+```{r}
+#| label: setup
+library(lme4)
+library(readxl)
+library(dplyr)
+library(sjPlot)
+
+# working matrix exported by the last cell of resp_icp_compliance.ipynb
+# (filtered windows + ICCA enrichment + cluster label)
+path_data <- "df_for_stats/anais_design_matrix_bb_v2.xlsx"
+ctrl <- glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5))
+```
+
+```{r}
+#| label: data
+data <- read_excel(path_data)
+
+# drug doses: an NA means the syringe pump was not running, hence a zero dose.
+# Without this, glmer silently drops the affected windows (2556 on sufentanil alone).
+drugs <- c("propofol", "sufentanil", "midazolam")
+
+d <- data |>
+  filter(label_max_icp_phase %in% c("inspiration", "expiration")) |>
+  mutate(
+    across(all_of(drugs), \(x) coalesce(x, 0)),
+    subject          = factor(subject),
+    insp             = as.integer(label_max_icp_phase == "inspiration"),
+    ventilation_mode = relevel(factor(ventilation_mode), ref = "controlled"),
+    sedation_f       = factor(sedation),
+    cluster          = factor(cluster)
+  )
+
+print(d)
+```
+
+## Model
+
+```{r}
+#| label: model
+model <- glmer(
+  insp ~ icp + icp_pulse_amplitude + P2P1 + resp_rate + ventilation_mode + sedation_f + sufentanil + (1 | subject),
+  data = d,
+  family = binomial,
+  control = ctrl          # bobyqa, defined in the setup cell
+)
+
+tab_model(model, show.aic = TRUE, show.icc = TRUE, show.re.var = TRUE, show.obs = TRUE)
+```
