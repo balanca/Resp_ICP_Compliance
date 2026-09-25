@@ -47,7 +47,7 @@ library(readxl)
 library(dplyr)
 library(sjPlot)
 
-# working matrix exported by the last cell of resp_icp_compliance.ipynb
+# working matrix exported by the last cell of resp_in_icp_complianceV2.ipynb
 # (filtered windows + ICCA enrichment + cluster label)
 path_data <- "df_for_stats/anais_design_matrix_bb_v2.xlsx"
 ctrl <- glmerControl(optimizer = "bobyqa", optCtrl = list(maxfun = 2e5))

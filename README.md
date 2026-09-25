@@ -26,17 +26,19 @@ Developed by Anaïs (MSc project), Valentin Ghibaudo, Baptiste Balança.
    - `concat_and_save` concatenates the patients into `df_for_stats/anais_design_matrix_bb.xlsx`.
    - `fig_overview_job` draws one overview figure per patient in `figures/overview/`.
    - `get_run_keys` lists the analysed patients and the exclusions.
-4. `resp_icp_compliance.ipynb`:
+4. `resp_in_icp_complianceV2.ipynb`:
    - *Respiratory phase of the ICP peak*: outlier screening (ICP, pulse amplitude, respiratory
      rate), population table, comparison of inspiratory vs expiratory windows (window-level and
      subject-level paired tests), enrichment of the windows with ICCA data (propofol, sufentanil,
      midazolam, Glasgow, heart rate, drained CSF; cached in `df_for_stats/icca_enrichment.pkl`),
      patient-level view (skull status, diagnosis, delay to monitoring).
    - *Cerebral compliance profiles*: k-means on the standardised compliance markers, choice of k
-     by patient-bootstrap stability (plus elbow, silhouette, BIC), PCA projection, physiological
-     and clinical characterisation of the clusters, share of the between-patient effect,
-     hierarchical clustering of patient profiles, cluster trajectories over the stay, and the
-     time course of the markers around the entry into the poor-compliance cluster.
+     by patient-bootstrap stability (plus elbow, silhouette, BIC), PCA projection, weight of each
+     marker in the partition (PCA loadings, eta2, drop-one ablation with bootstrap stability),
+     physiological and clinical characterisation of the clusters, share of the between-patient
+     effect, hierarchical clustering of patient profiles, cluster trajectories over the stay, and
+     the time course of the markers around the entry into the poor-compliance cluster and around
+     the exits C3 -> C1 and C2 -> C1.
    - The last cell exports the working matrix `df_for_stats/anais_design_matrix_bb_v2.xlsx`
      (filtered windows + ICCA columns + cluster label).
 5. `resp_ICP.qmd` — mixed-effects logistic regression (`lme4::glmer`, random intercept per
